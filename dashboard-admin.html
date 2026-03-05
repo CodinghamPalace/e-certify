@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — e-Certify | DICT Quezon 4A</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --dict-blue:    #003087;
+      --dict-blue-dk: #00205b;
+      --dict-gold:    #f5a623;
+      --sidebar-w:    260px;
+      --topbar-h:     64px;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────── */
+    body {
+      background: #f0f4f9;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────── */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--dict-blue-dk);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      transition: transform .3s ease;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .sidebar-brand img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .sidebar-brand-text {
+      line-height: 1.2;
+    }
+    .sidebar-brand-text .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .sidebar-brand-text .brand-sub {
+      font-size: .7rem;
+      color: rgba(255,255,255,.55);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+      overflow-y: auto;
+    }
+    .sidebar-nav .nav-label {
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.35);
+      padding: 14px 22px 6px;
+    }
+    .sidebar-nav .nav-item a,
+    .sidebar-nav .nav-item button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 22px;
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      font-size: .875rem;
+      border-radius: 0;
+      border: none;
+      background: transparent;
+      width: 100%;
+      transition: background .18s, color .18s;
+    }
+    .sidebar-nav .nav-item a:hover,
+    .sidebar-nav .nav-item button:hover {
+      background: rgba(255,255,255,.08);
+      color: #fff;
+    }
+    .sidebar-nav .nav-item a.active {
+      background: var(--dict-blue);
+      color: #fff;
+      border-left: 3px solid var(--dict-gold);
+      padding-left: 19px;
+    }
+    .sidebar-nav .nav-item a i,
+    .sidebar-nav .nav-item button i {
+      font-size: 1.05rem;
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 16px 22px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      font-size: .72rem;
+      color: rgba(255,255,255,.3);
+      text-align: center;
+    }
+
+    /* ── Topbar ──────────────────────────────────────────────── */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      z-index: 999;
+    }
+    .topbar-left .page-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--dict-blue-dk);
+    }
+    .topbar-left .breadcrumb {
+      margin: 0;
+      font-size: .75rem;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .topbar-date {
+      font-size: .8rem;
+      color: #64748b;
+    }
+    .topbar-date i { margin-right: 4px; }
+
+    .notif-btn {
+      position: relative;
+      background: #f1f5f9;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      transition: background .18s;
+    }
+    .notif-btn:hover { background: #e2e8f0; }
+    .notif-badge {
+      position: absolute;
+      top: 5px; right: 5px;
+      width: 8px; height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+    }
+
+    .admin-avatar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .admin-avatar .avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--dict-blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+    .admin-avatar .admin-info .admin-name {
+      font-size: .83rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.2;
+    }
+    .admin-avatar .admin-info .admin-role {
+      font-size: .7rem;
+      color: #94a3b8;
+    }
+
+    /* ── Main Content ────────────────────────────────────────── */
+    #main-content {
+      margin-left: var(--sidebar-w);
+      margin-top: var(--topbar-h);
+      padding: 30px 32px;
+      min-height: calc(100vh - var(--topbar-h));
+    }
+
+    /* ── Summary Cards ───────────────────────────────────────── */
+    .summary-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px 24px;
+      border: 1px solid #e9eef5;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .summary-card:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,.08);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .icon-blue   { background: #dbeafe; color: #2563eb; }
+    .icon-green  { background: #dcfce7; color: #16a34a; }
+    .icon-gold   { background: #fef9c3; color: #ca8a04; }
+    .icon-orange { background: #ffedd5; color: #ea580c; }
+
+    .card-info .card-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1;
+    }
+    .card-info .card-label {
+      font-size: .78rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .card-info .card-trend {
+      font-size: .72rem;
+      margin-top: 5px;
+    }
+    .trend-up   { color: #16a34a; }
+    .trend-down { color: #dc2626; }
+
+    /* ── Section Header ──────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* ── Table Card ──────────────────────────────────────────── */
+    .table-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e9eef5;
+      overflow: hidden;
+    }
+    .table-card .table {
+      margin: 0;
+      font-size: .845rem;
+    }
+    .table-card .table thead th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 18px;
+    }
+    .table-card .table tbody td {
+      padding: 13px 18px;
+      vertical-align: middle;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .table-card .table tbody tr:last-child td { border-bottom: none; }
+    .table-card .table tbody tr:hover td { background: #f8fafc; }
+
+    .event-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .event-name small {
+      display: block;
+      font-weight: 400;
+      font-size: .72rem;
+      color: #94a3b8;
+    }
+
+    .badge-completed {
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+    .badge-ongoing {
+      background: #fef9c3;
+      color: #a16207;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+    .badge-scheduled {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    .participant-count i {
+      color: #94a3b8;
+      margin-right: 4px;
+    }
+
+    /* ── Logout confirm ──────────────────────────────────────── */
+    #logoutModal .modal-header {
+      background: var(--dict-blue-dk);
+      color: #fff;
+    }
+    #logoutModal .modal-header .btn-close { filter: invert(1); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ SIDEBAR ══════════════════════════ -->
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <img src="dict_logo.png" alt="DICT Logo" onerror="this.style.display='none'">
+    <div class="sidebar-brand-text">
+      <div class="brand-title">e-Certify</div>
+      <div class="brand-sub">DICT Quezon 4A</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+
+    <div class="nav-item">
+      <a href="#" class="active">
+        <i class="bi bi-grid-1x2-fill"></i>
+        Dashboard
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="#">
+        <i class="bi bi-calendar-event-fill"></i>
+        Manage Events
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="#">
+        <i class="bi bi-cloud-upload-fill"></i>
+        Upload Participants
+      </a>
+    </div>
+
+    <div class="nav-label">Records</div>
+
+    <div class="nav-item">
+      <a href="#">
+        <i class="bi bi-patch-check-fill"></i>
+        Certificate Records
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="#">
+        <i class="bi bi-envelope-paper-fill"></i>
+        Email Queue Status
+        <span class="badge ms-auto" style="background:var(--dict-gold);color:#1e293b;font-size:.65rem;">3</span>
+      </a>
+    </div>
+
+    <div class="nav-label">Account</div>
+
+    <div class="nav-item">
+      <button data-bs-toggle="modal" data-bs-target="#logoutModal">
+        <i class="bi bi-box-arrow-right"></i>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    e-Certify MVP &copy; 2026
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════ TOPBAR ════════════════════════════ -->
+<header id="topbar">
+  <div class="topbar-left">
+    <div class="page-title">Dashboard</div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item active text-muted" style="font-size:.75rem;">Home</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="topbar-right">
+    <div class="topbar-date">
+      <i class="bi bi-calendar3"></i>
+      <span id="topbar-date-text"></span>
+    </div>
+
+    <!-- Notifications -->
+    <div class="dropdown">
+      <button class="notif-btn" data-bs-toggle="dropdown" aria-label="Notifications">
+        <i class="bi bi-bell-fill" style="font-size:.95rem;"></i>
+        <span class="notif-badge"></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="min-width:280px;font-size:.82rem;">
+        <li><h6 class="dropdown-header">Notifications</h6></li>
+        <li>
+          <a class="dropdown-item py-2" href="#">
+            <i class="bi bi-envelope-check text-success me-2"></i>
+            <strong>48 certificates</strong> sent for <em>Tech4ED Batch 3</em>
+            <div class="text-muted" style="font-size:.7rem;">2 hours ago</div>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item py-2" href="#">
+            <i class="bi bi-exclamation-circle text-warning me-2"></i>
+            <strong>3 emails</strong> in queue – pending retry
+            <div class="text-muted" style="font-size:.7rem;">5 hours ago</div>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item py-2" href="#">
+            <i class="bi bi-cloud-upload text-primary me-2"></i>
+            CSV upload completed for <em>DigiLit Program</em>
+            <div class="text-muted" style="font-size:.7rem;">Yesterday</div>
+          </a>
+        </li>
+        <li><hr class="dropdown-divider my-1"></li>
+        <li><a class="dropdown-item text-center text-primary" href="#">View all notifications</a></li>
+      </ul>
+    </div>
+
+    <!-- Admin Profile -->
+    <div class="admin-avatar dropdown">
+      <div class="d-flex align-items-center gap-2" data-bs-toggle="dropdown" style="cursor:pointer;">
+        <div class="avatar-circle">BM</div>
+        <div class="admin-info d-none d-md-block">
+          <div class="admin-name">Bonje Manza</div>
+          <div class="admin-role">IT Admin</div>
+        </div>
+        <i class="bi bi-chevron-down" style="font-size:.65rem;color:#94a3b8;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size:.82rem;">
+        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item text-danger" href="#"
+             data-bs-toggle="modal" data-bs-target="#logoutModal">
+            <i class="bi bi-box-arrow-right me-2"></i>Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════ MAIN CONTENT ══════════════════════ -->
+<main id="main-content">
+
+  <!-- Welcome Banner -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h5 class="mb-0 fw-bold" style="color:#1e293b;">Good morning, Bonje 👋</h5>
+      <p class="text-muted mb-0" style="font-size:.82rem;">Here's what's happening with your certificates today.</p>
+    </div>
+    <a href="#" class="btn btn-sm btn-primary d-flex align-items-center gap-2"
+       style="background:var(--dict-blue);border-color:var(--dict-blue);border-radius:8px;font-size:.82rem;">
+      <i class="bi bi-plus-lg"></i> New Event
+    </a>
+  </div>
+
+  <!-- ── Summary Cards ── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="summary-card">
+        <div class="card-icon icon-blue">
+          <i class="bi bi-calendar-event-fill"></i>
+        </div>
+        <div class="card-info">
+          <div class="card-value">12</div>
+          <div class="card-label">Total Events</div>
+          <div class="card-trend trend-up">
+            <i class="bi bi-arrow-up-short"></i> 2 this month
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="summary-card">
+        <div class="card-icon icon-green">
+          <i class="bi bi-patch-check-fill"></i>
+        </div>
+        <div class="card-info">
+          <div class="card-value">1,348</div>
+          <div class="card-label">Certificates Generated</div>
+          <div class="card-trend trend-up">
+            <i class="bi bi-arrow-up-short"></i> 48 today
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="summary-card">
+        <div class="card-icon icon-gold">
+          <i class="bi bi-envelope-check-fill"></i>
+        </div>
+        <div class="card-info">
+          <div class="card-value">1,345</div>
+          <div class="card-label">Emails Sent</div>
+          <div class="card-trend trend-up">
+            <i class="bi bi-arrow-up-short"></i> 99.8% delivery
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="summary-card">
+        <div class="card-icon icon-orange">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="card-info">
+          <div class="card-value">3</div>
+          <div class="card-label">Pending Emails</div>
+          <div class="card-trend trend-down">
+            <i class="bi bi-arrow-down-short"></i> Retry queued
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- /Summary Cards -->
+
+  <!-- ── Recent Events Table ── -->
+  <div class="section-header">
+    <div class="section-title">
+      <i class="bi bi-clock-history me-2" style="color:var(--dict-blue);"></i>
+      Recent Events
+    </div>
+    <a href="#" class="btn btn-sm btn-outline-secondary"
+       style="font-size:.78rem;border-radius:7px;">
+      View All <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+
+  <div class="table-card">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Event Name</th>
+          <th>Date</th>
+          <th>Participants</th>
+          <th>Certificates</th>
+          <th>Status</th>
+          <th style="width:80px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-muted" style="font-size:.78rem;">01</td>
+          <td>
+            <div class="event-name">
+              Tech4ED Digital Literacy Program
+              <small>Quezon Province — Batch 3</small>
+            </div>
+          </td>
+          <td style="white-space:nowrap;font-size:.82rem;">Feb 28, 2026</td>
+          <td class="participant-count">
+            <i class="bi bi-people-fill"></i>48
+          </td>
+          <td style="font-size:.82rem;">48 / 48</td>
+          <td><span class="badge-completed">Completed</span></td>
+          <td>
+            <a href="#" class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:.72rem;border-radius:6px;" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-muted" style="font-size:.78rem;">02</td>
+          <td>
+            <div class="event-name">
+              Cybersecurity Awareness Seminar
+              <small>LGU Lucena City</small>
+            </div>
+          </td>
+          <td style="white-space:nowrap;font-size:.82rem;">Mar 3, 2026</td>
+          <td class="participant-count">
+            <i class="bi bi-people-fill"></i>72
+          </td>
+          <td style="font-size:.82rem;">72 / 72</td>
+          <td><span class="badge-completed">Completed</span></td>
+          <td>
+            <a href="#" class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:.72rem;border-radius:6px;" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-muted" style="font-size:.78rem;">03</td>
+          <td>
+            <div class="event-name">
+              Free Wi-Fi Program Orientation
+              <small>Atimonan, Quezon</small>
+            </div>
+          </td>
+          <td style="white-space:nowrap;font-size:.82rem;">Mar 4, 2026</td>
+          <td class="participant-count">
+            <i class="bi bi-people-fill"></i>35
+          </td>
+          <td style="font-size:.82rem;">0 / 35</td>
+          <td><span class="badge-ongoing">Ongoing</span></td>
+          <td>
+            <a href="#" class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:.72rem;border-radius:6px;" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-muted" style="font-size:.78rem;">04</td>
+          <td>
+            <div class="event-name">
+              ICT for Public Service Training
+              <small>Tayabas City</small>
+            </div>
+          </td>
+          <td style="white-space:nowrap;font-size:.82rem;">Mar 10, 2026</td>
+          <td class="participant-count">
+            <i class="bi bi-people-fill"></i>60
+          </td>
+          <td style="font-size:.82rem;">— / 60</td>
+          <td><span class="badge-scheduled">Scheduled</span></td>
+          <td>
+            <a href="#" class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:.72rem;border-radius:6px;" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-muted" style="font-size:.78rem;">05</td>
+          <td>
+            <div class="event-name">
+              Digital Transformation Workshop
+              <small>DICT Quezon 4A Office, Lucena</small>
+            </div>
+          </td>
+          <td style="white-space:nowrap;font-size:.82rem;">Feb 14, 2026</td>
+          <td class="participant-count">
+            <i class="bi bi-people-fill"></i>90
+          </td>
+          <td style="font-size:.82rem;">90 / 90</td>
+          <td><span class="badge-completed">Completed</span></td>
+          <td>
+            <a href="#" class="btn btn-sm btn-outline-primary py-0 px-2"
+               style="font-size:.72rem;border-radius:6px;" title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- /Recent Events Table -->
+
+</main>
+<!-- /Main Content -->
+
+<!-- ═══════════════════════════════════════ LOGOUT MODAL ══════════════════════ -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h6 class="modal-title fw-semibold" id="logoutModalLabel">
+          <i class="bi bi-box-arrow-right me-2"></i>Confirm Logout
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4" style="font-size:.88rem;">
+        <i class="bi bi-shield-lock-fill mb-3 d-block" style="font-size:2rem;color:var(--dict-blue);"></i>
+        Are you sure you want to log out of <strong>e-Certify</strong>?
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-sm btn-danger">Yes, Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Live date in topbar
+  (function () {
+    const el = document.getElementById('topbar-date-text');
+    const opts = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    el.textContent = new Date().toLocaleDateString('en-PH', opts);
+  })();
+</script>
+</body>
+</html>
