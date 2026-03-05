@@ -26,10 +26,15 @@ A Laravel-based web application that automates the bulk generation, distribution
 | Layer | Technology |
 |---|---|
 | Backend | PHP 8.x + Laravel |
-| Frontend | HTML5, CSS3, Bootstrap 5 |
-| Database | MySQL / MariaDB (via Laragon) |
+| Frontend | Laravel Livewire + HTML5, CSS3 |
+| UI Framework | Bootstrap 5 |
+| Database | MySQL / MariaDB |
+| Local Development Environment | Laragon |
 | PDF Generation | dompdf / laravel-snappy |
 | QR Code | Simple QrCode |
+| Email Delivery | Laravel Mail with SMTP |
+| Background Processing | Laravel Queue |
+| Version Control | Git/Github | 
 
 ---
 

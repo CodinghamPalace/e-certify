@@ -1,59 +1,106 @@
-<x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<x-layouts::auth :title="__('Admin Login — e-Certify | DICT Quezon 4A')">
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+    {{-- Session status (e.g. password reset success) --}}
+    @if (session('status'))
+        <div class="login-alert alert alert-success d-flex align-items-center mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('status') }}
+        </div>
+    @endif
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
-            @csrf
+    {{-- Validation error alert --}}
+    @if ($errors->any())
+        <div class="login-alert alert alert-danger d-flex align-items-center mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ $errors->first() }}
+        </div>
+    @endif
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
+    <form method="POST" action="{{ route('login.store') }}" novalidate>
+        @csrf
+
+        {{-- Email --}}
+        <div class="mb-1">
+            <label class="form-label" for="adminEmail">Email Address</label>
+        </div>
+        <div class="input-group-custom">
+            <i class="bi bi-envelope-fill input-icon"></i>
+            <input
                 type="email"
-                required
-                autofocus
+                id="adminEmail"
+                name="email"
+                class="form-control-custom @error('email') is-invalid @enderror"
+                placeholder="admin@dict.gov.ph"
+                value="{{ old('email') }}"
                 autocomplete="email"
-                placeholder="email@example.com"
+                autofocus
+                required
             />
+        </div>
 
-            <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
+        {{-- Password --}}
+        <div class="mb-1">
+            <label class="form-label" for="adminPassword">Password</label>
+        </div>
+        <div class="input-group-custom">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+                type="password"
+                id="adminPassword"
+                name="password"
+                class="form-control-custom @error('password') is-invalid @enderror"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                style="padding-right: 42px;"
+                required
+            />
+            <button
+                type="button"
+                class="toggle-pw"
+                id="togglePw"
+                aria-label="Show/hide password"
+                tabindex="-1"
+            >
+                <i class="bi bi-eye-fill" id="togglePwIcon"></i>
+            </button>
+        </div>
+
+        {{-- Remember me / Forgot password --}}
+        <div class="row-meta">
+            <label>
+                <input
+                    type="checkbox"
+                    name="remember"
+                    id="rememberMe"
+                    {{ old('remember') ? 'checked' : '' }}
                 />
+                Remember me
+            </label>
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+            @endif
+        </div>
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
-            </div>
+        {{-- Submit --}}
+        <button type="submit" class="btn-login" id="loginBtn">
+            <i class="bi bi-shield-lock-fill"></i>
+            <span>Sign In</span>
+        </button>
 
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+    </form>
 
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
-            </div>
-        </form>
-
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
+    {{-- Security note --}}
+    <div class="security-note">
+        <i class="bi bi-shield-check-fill"></i>
+        Authorized DICT personnel only &bull; All sessions are logged
     </div>
+
+    {{-- Register link --}}
+    @if (Route::has('register'))
+        <div class="security-note mt-2">
+            New admin?&nbsp;<a href="{{ route('register') }}" class="forgot-link">Create an account</a>
+        </div>
+    @endif
+
 </x-layouts::auth>
+
