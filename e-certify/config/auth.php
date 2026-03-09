@@ -114,4 +114,22 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification
+    |--------------------------------------------------------------------------
+    |
+    | These options control the expiration and throttling for email verification
+    | links. Setting the expiry to 60 minutes ensures verification URLs become
+    | invalid after one hour, aligning with DICT security requirements.
+    |
+    */
+
+    'verification' => [
+        'expire' => 60,
+        'throttle' => 60,
+        'max_attempts' => 5,
+        'lock_seconds' => 3600,
+    ],
+
 ];
