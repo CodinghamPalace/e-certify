@@ -372,7 +372,7 @@
       </a>
     </div>
     <div class="nav-item">
-      <a href="#">
+      <a href="{{ route('events.index') }}" class="{{ request()->routeIs('events.index') ? 'active' : '' }}">
         <i class="bi bi-calendar-event-fill"></i>
         Manage Events
       </a>
