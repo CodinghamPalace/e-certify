@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TrainingEvent extends Model
 {
+    /** @use HasFactory<\Database\Factories\TrainingEventFactory> */
     use HasFactory;
 
     /**
@@ -22,6 +24,14 @@ class TrainingEvent extends Model
         'template_path',
         'uuid_prefix',
     ];
+
+    /**
+     * Get the participants for the training event.
+     */
+    public function participants(): HasMany
+    {
+        return $this->hasMany(Participant::class);
+    }
 
     /**
      * Get the attributes that should be cast.
