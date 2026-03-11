@@ -66,7 +66,7 @@ class ManageEvents extends Component
     {
         $this->resetForm();
         $event = TrainingEvent::findOrFail($id);
-        
+
         $this->eventId = $event->id;
         $this->title = $event->title;
         $this->description = $event->description;
