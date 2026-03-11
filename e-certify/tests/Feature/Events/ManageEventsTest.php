@@ -69,7 +69,65 @@ test('it can delete a training event', function () {
 
     Livewire::actingAs($this->user)
         ->test(\App\Livewire\Events\ManageEvents::class)
-        ->call('delete', $event->id);
+        ->call('confirmDelete', $event->id)
+        ->assertSet('showDeleteModal', true)
+        ->assertSet('eventToDelete', $event->id)
+        ->call('delete')
+        ->assertSet('showDeleteModal', false)
+        ->assertSet('eventToDelete', null)
+        ->assertHasNoErrors();
 
     $this->assertDatabaseMissing('training_events', ['id' => $event->id]);
 });
+
+test('it handles database errors during deletion', function () {
+    $event = TrainingEvent::factory()->create();
+
+    // We can simulate a failure by deleting it from the DB first
+    // or by mocking the model. For simplicity, we'll just ensure
+    // the component doesn't crash if the event is already gone.
+    $event->delete();
+
+    Livewire::actingAs($this->user)
+        ->test(\App\Livewire\Events\ManageEvents::class)
+        ->call('confirmDelete', 999) // Non-existent ID
+        ->call('delete')
+        ->assertHasNoErrors(); // It should handle it gracefully
+});
+
+test('it validates event creation', function () {
+    Livewire::actingAs($this->user)
+        ->test(\App\Livewire\Events\ManageEvents::class)
+        ->call('create')
+        ->set('title', '') // Empty title
+        ->set('date', 'invalid-date')
+        ->call('save')
+        ->assertHasErrors(['title' => 'required', 'date' => 'date'])
+        ->assertSet('showModal', true); // Modal should remain open
+});
+
+test('it validates unique uuid prefix on creation', function () {
+    TrainingEvent::factory()->create(['uuid_prefix' => 'EXISTING-']);
+
+    Livewire::actingAs($this->user)
+        ->test(\App\Livewire\Events\ManageEvents::class)
+        ->call('create')
+        ->set('title', 'New Event')
+        ->set('date', '2026-04-15')
+        ->set('uuid_prefix', 'EXISTING-')
+        ->call('save')
+        ->assertHasErrors(['uuid_prefix' => 'unique'])
+        ->assertSet('showModal', true);
+});
+
+test('it displays empty state when no search results are found', function () {
+    TrainingEvent::factory()->create(['title' => 'Sample Event']);
+
+    Livewire::actingAs($this->user)
+        ->test(\App\Livewire\Events\ManageEvents::class)
+        ->set('search', 'Non-existent Query')
+        ->assertSee('No events found')
+        ->assertSee('Try adjusting your search')
+        ->assertDontSee('Sample Event');
+});
+

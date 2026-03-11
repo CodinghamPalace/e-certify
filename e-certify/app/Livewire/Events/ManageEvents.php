@@ -16,8 +16,10 @@ class ManageEvents extends Component
 
     // Modal state
     public $showModal = false;
+    public $showDeleteModal = false;
     public $isEditing = false;
     public $eventId = null;
+    public $eventToDelete = null;
 
     // Form data
     public $title = '';
@@ -104,17 +106,48 @@ class ManageEvents extends Component
     }
 
     /**
-     * Delete an event.
+     * Confirm deletion of an event.
      */
-    public function delete($id)
+    public function confirmDelete($id)
     {
-        $event = TrainingEvent::findOrFail($id);
-        $event->delete();
-        session()->flash('message', 'Event deleted successfully.');
+        $this->eventToDelete = $id;
+        $this->showDeleteModal = true;
     }
 
     /**
-     * Close the modal and reset state.
+     * Delete an event.
+     */
+    public function delete()
+    {
+        if ($this->eventToDelete) {
+            try {
+                $event = TrainingEvent::find($this->eventToDelete);
+                
+                if ($event) {
+                    $event->delete();
+                    session()->flash('message', 'Event deleted successfully.');
+                } else {
+                    session()->flash('error', 'Event not found or already deleted.');
+                }
+            } catch (\Exception $e) {
+                session()->flash('error', 'Failed to delete event. It may be linked to other records.');
+            }
+        }
+        
+        $this->closeDeleteModal();
+    }
+
+    /**
+     * Close the delete modal and reset state.
+     */
+    public function closeDeleteModal()
+    {
+        $this->showDeleteModal = false;
+        $this->eventToDelete = null;
+    }
+
+    /**
+     * Close the creation/edit modal and reset state.
      */
     public function closeModal()
     {
