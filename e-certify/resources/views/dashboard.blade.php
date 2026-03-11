@@ -5,7 +5,7 @@
       <h5 class="mb-0 fw-bold" style="color:#1e293b;">Good morning, {{ auth()->user()->name }} 👋</h5>
       <p class="text-muted mb-0" style="font-size:.82rem;">Here's what's happening with your certificates today.</p>
     </div>
-    <a href="#" class="btn btn-sm btn-primary d-flex align-items-center gap-2"
+    <a href="{{ route('events.index', ['create' => 1]) }}" class="btn btn-sm btn-primary d-flex align-items-center gap-2"
        style="background:var(--dict-blue);border-color:var(--dict-blue);border-radius:8px;font-size:.82rem;">
       <i class="bi bi-plus-lg"></i> New Event
     </a>
