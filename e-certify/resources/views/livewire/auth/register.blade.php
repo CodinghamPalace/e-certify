@@ -74,6 +74,9 @@
                 <i class="bi bi-eye-fill" id="togglePwRegIcon"></i>
             </button>
         </div>
+        <p style="font-size:.75rem;color:#64748b;margin:-10px 0 14px 0;">
+            Minimum 8 characters, with at least 1 uppercase letter and 1 special symbol.
+        </p>
 
         {{-- Confirm Password --}}
         <div class="mb-1">

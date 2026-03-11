@@ -294,7 +294,7 @@
       <div class="logo-area">
         <div class="logo-circle">
           <img
-            src="{{ asset('dict-logo-small.png') }}"
+            src="{{ asset('dict-logo-small-nobg.png') }}"
             alt="DICT Logo"
             onerror="this.outerHTML='<span class=\'logo-fallback\'>DICT</span>'"
           />
