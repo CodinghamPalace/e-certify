@@ -62,6 +62,10 @@
                             <td class="d-none d-lg-table-cell"><span class="badge" style="background:#dbeafe; color:#1d4ed8; font-size:.72rem;">{{ $event->uuid_prefix }}</span></td>
                             <td>
                                 <div class="d-flex gap-1">
+                                    <a href="{{ route('events.participants', $event) }}" class="btn btn-sm btn-outline-success py-0 px-2"
+                                        style="font-size:.72rem;border-radius:6px;" title="Manage Participants">
+                                        <i class="bi bi-people-fill"></i>
+                                    </a>
                                     <button wire:click="edit({{ $event->id }})" type="button" class="btn btn-sm btn-outline-primary py-0 px-2"
                                         style="font-size:.72rem;border-radius:6px;" title="Edit">
                                         <i class="bi bi-pencil-square"></i>
