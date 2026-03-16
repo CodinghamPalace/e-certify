@@ -36,7 +36,7 @@
                     type="submit"
                     variant="primary"
                     class="w-full"
-                    @disabled($throttled || $maxedOut)
+                    :disabled="$throttled || $maxedOut"
                     data-test="resend-verification"
                 >
                     {{ __('Resend verification email') }}
@@ -45,7 +45,7 @@
                     type="submit"
                     variant="secondary"
                     class="w-full"
-                    @disabled($throttled || $maxedOut)
+                    :disabled="$throttled || $maxedOut"
                 >
                     {{ __('Send a fresh secure link') }}
                 </flux:button>
