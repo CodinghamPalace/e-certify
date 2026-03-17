@@ -1,0 +1,62 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: e_certify_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: e_certify
+      DB_USERNAME: e_certify_user
+      DB_PASSWORD: secret
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    container_name: e_certify_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: e_certify
+      MYSQL_USER: e_certify_user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  composer:
+    image: composer:2.8
+    container_name: e_certify_composer
+    working_dir: /app
+    volumes:
+      - ./:/app
+    entrypoint: ["composer"]
+
+  node:
+    image: node:22-alpine
+    container_name: e_certify_node
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+
+volumes:
+  mysql_data:
