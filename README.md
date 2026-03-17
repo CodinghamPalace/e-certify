@@ -1,103 +1,102 @@
-# e-Certify: E-Certificate Management & Verification System
-**DICT Quezon 4A** | Prepared by: Group 2, IT Intern | February 26, 2026
+# Laravel + Livewire Starter Kit
 
----
+## Docker Setup For Team Development
 
-## Overview
+This project now includes a Docker setup so everyone on the team runs the same versions of key services:
 
-A Laravel-based web application that automates the bulk generation, distribution, and public verification of e-certificates for DICT Quezon 4A training events.
+- PHP: `8.2` (from `php:8.2-cli-bookworm`)
+- MySQL: `8.4` (from `mysql:8.4`)
+- Composer: `2.8` (from `composer:2.8`)
+- Node: `22` (from `node:22-alpine`)
 
----
+### 1. Build and start containers
 
-## Core Features (MVP)
-
-1. **Admin Authentication** — Secure login for DICT staff
-2. **Training Event Management** — CRUD interface for events
-3. **CSV Bulk Upload** — Parse and link participant data to events
-4. **PDF Certificate Generation** — Map participant data to official DICT template
-5. **QR Code Embedding** — Unique UUID per participant, stamped onto PDF
-6. **Email Queue** — Automated background dispatch of certificates to participants
-7. **Public Verification Portal** — Landing page to scan/validate QR codes against the database
-
----
-
-## Technology Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | PHP 8.x + Laravel |
-| Frontend | HTML5, CSS3, Bootstrap 5 |
-| Database | MySQL / MariaDB (via Laragon) |
-| PDF Generation | dompdf / laravel-snappy |
-| QR Code | Simple QrCode |
-
----
-
-## Target Users
-
-- **DICT Admin** — Uploads participant data, manages events, triggers generation
-- **Participants** — Receive certificates via email
-- **Third-Party Verifiers** — Scan QR codes on the public portal to verify authenticity
-
----
-
-## System Workflow
-
-```
-Admin uploads CSV
-    → Parse & validate data
-    → Generate UUID per participant
-    → Generate QR Code
-    → Map data to certificate template
-    → Generate PDF
-    → Store record in DB
-    → Queue email job
-    → Send certificate to participant
-
-Third-Party Verifier scans QR Code
-    → Redirect to public verification portal
-    → Validate UUID against DB
-    → Display verification result
+```bash
+docker compose up -d --build mysql app
 ```
 
----
+### 2. Install PHP dependencies with pinned Composer
 
-## Implementation Timeline (8 Weeks)
+```bash
+docker compose run --rm composer install
+```
 
-| Week | Phase | Key Tasks |
-|---|---|---|
-| 1 | Planning & Setup | Requirements, DB schema, Laravel init, local env |
-| 2 | Auth & Event Module | Admin login, Training Event CRUD |
-| 3 | Data Ingestion | CSV upload, parsing, link to events |
-| 4 | PDF Generation | PDF library integration, template mapping |
-| 5 | QR Integration | UUID generation, QR stamping on PDFs |
-| 6 | Email Automation | SMTP config, Laravel Jobs/Queues |
-| 7 | Verification Portal | Public QR scan page, DB validation logic |
-| 8 | Testing & Turnover | UAT with DICT staff, bug fixes, UI polish, handover |
+### 3. Prepare Laravel app
 
----
+```bash
+docker compose exec app cp .env.example .env
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+```
 
-## Required Assets (Request from DICT Office)
+If `.env.example` does not exist in your copy, create `.env` manually and ensure these values are set:
 
-- [ ] High-resolution DICT logo (transparent PNG)
-- [ ] Bagong Pilipinas logo (transparent PNG)
-- [ ] Relevant program logos (transparent PNG)
-- [ ] Digital e-signatures of approving authorities (transparent PNG)
-- [ ] Standard blank certificate background template
-- [ ] Access to staging environment (by Week 7)
+```env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=e_certify
+DB_USERNAME=e_certify_user
+DB_PASSWORD=secret
+```
 
----
+### 4. Run Laravel app
 
-## Scope & Limitations
+```bash
+docker compose exec app php artisan serve --host=0.0.0.0 --port=8000
+```
 
-**In Scope:**
-- Admin authentication
-- Bulk CSV participant upload
-- PDF generation with QR code
-- Automated email dispatch
-- Public QR verification portal
+Open: `http://localhost:8000`
 
-**Out of Scope (MVP):**
-- Online event registration
-- Multiple certificate layout formats
-- Analytics, facial recognition, or attendance tracking
+### 5. Run Vite dev server (optional)
+
+```bash
+docker compose up node
+```
+
+Open: `http://localhost:5173`
+
+### Useful commands
+
+```bash
+# Stop all services
+docker compose down
+
+# Stop and remove DB data volume
+docker compose down -v
+
+# Run tests
+docker compose exec app php artisan test
+
+# Run composer command
+docker compose run --rm composer update
+```
+
+## Introduction
+
+Our Laravel + [Livewire](https://livewire.laravel.com) starter kit provides a robust, modern starting point for building Laravel applications with a Livewire frontend.
+
+Livewire is a powerful way of building dynamic, reactive, frontend UIs using just PHP. It's a great fit for teams that primarily use Blade templates and are looking for a simpler alternative to JavaScript-driven SPA frameworks like React and Vue.
+
+This Livewire starter kit utilizes Livewire 4, TypeScript, Tailwind, and the [Flux UI](https://fluxui.dev) component library.
+
+If you are looking for the alternate configurations of this starter kit, they can be found in the following branches:
+
+- [components](https://github.com/laravel/livewire-starter-kit/tree/components) - if Volt is not selected
+- [workos](https://github.com/laravel/livewire-starter-kit/tree/workos) - if WorkOS is selected for authentication
+
+## Official Documentation
+
+Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
+
+## Contributing
+
+Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## License
+
+The Laravel + Livewire starter kit is open-sourced software licensed under the MIT license.
