@@ -1,1 +1,0 @@
-<flux:icon variant="BLAZE_PLACEHOLDER_PVWGLT6BLBGSUKXE" icon="check" class="BLAZE_PLACEHOLDER_QTQKFSFFWYMX6QQD" data-flux-menu-item-icon />
