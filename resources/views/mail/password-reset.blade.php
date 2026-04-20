@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Reset Request – e-Certify</title>
+</head>
+<body style="margin:0;padding:24px;background-color:#ffffff;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#333333;">
+    @php
+        $logoPath = public_path('dict-logo-small-nobg.png');
+        $logoSrc = asset('dict-logo-small-nobg.png');
+
+        if (is_file($logoPath) && is_readable($logoPath)) {
+            $mimeType = mime_content_type($logoPath) ?: 'image/png';
+            $logoSrc = 'data:'.$mimeType.';base64,'.base64_encode((string) file_get_contents($logoPath));
+        }
+    @endphp
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;margin:0 auto;border:1px solid #e0e7ef;border-radius:12px;box-shadow:0 6px 24px rgba(13,71,161,0.08);">
+        <tr>
+            <td style="padding:32px 32px 24px 32px;text-align:center;border-bottom:1px solid #e0e7ef;background:linear-gradient(120deg,#ffffff 0%,#e3f2fd 100%);">
+                <img src="{{ $logoSrc }}" alt="DICT Logo" width="72" height="72" style="margin-bottom:12px;" />
+                <div style="font-size:18px;font-weight:600;color:#0d47a1;">Department of Information and Communications Technology</div>
+                <div style="font-size:15px;color:#1976d2;margin-top:4px;">{{ $systemName ?? config('app.name', 'DICT e-Certify System') }}</div>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:32px;">
+                <div style="font-size:20px;font-weight:600;margin-bottom:12px;color:#0d47a1;">Password Reset Request</div>
+                <p style="margin:0 0 16px 0;line-height:1.6;">Dear User,</p>
+                <p style="margin:0 0 16px 0;line-height:1.6;">
+                    We received a request to reset your password for the DICT e-Certify System. Click the button below to choose a new password.
+                </p>
+                <p style="margin:0 0 16px 0;line-height:1.6;">
+                    This secure link will expire in {{ $expiresInMinutes }} minutes for your protection.
+                </p>
+                <div style="text-align:center;margin:32px 0;">
+                    <a href="{{ $resetUrl }}" style="background-color:#0d47a1;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:999px;font-weight:600;display:inline-block;">Reset Password</a>
+                </div>
+                <p style="margin:0 0 16px 0;line-height:1.6;">
+                    If the button above does not work, copy and paste the link below into your browser:
+                </p>
+                <p style="margin:0 0 24px 0;line-height:1.6;word-break:break-all;">
+                    <a href="{{ $rawUrl ?? $resetUrl }}" style="color:#1976d2;text-decoration:none;">{{ $rawUrl ?? $resetUrl }}</a>
+                </p>
+                <p style="margin:0 0 16px 0;line-height:1.6;">
+                    If you did not request a password reset, you can safely ignore this email and your password will remain unchanged.
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:24px 32px;background-color:#f6f8fc;border-top:1px solid #e0e7ef;text-align:center;font-size:12px;line-height:1.6;color:#5f6b7a;">
+                This is an automated message from the e-Certify System of the Department of Information and Communications Technology (DICT).<br />
+                Please do not reply to this email.
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,103 +1,215 @@
-# e-Certify: E-Certificate Management & Verification System
-**DICT Quezon 4A** | Prepared by: Group 2, IT Intern | February 26, 2026
+# e-Certify: E-Certificate Management and Verification System
 
----
+DICT Quezon 4A | Group 2 IT Interns
 
 ## Overview
 
-A Laravel-based web application that automates the bulk generation, distribution, and public verification of e-certificates for DICT Quezon 4A training events.
+e-Certify is a Laravel + Livewire web application for managing training events, importing participant records, and supporting certificate workflows with public verification support.
 
----
+## Core Features
 
-## Core Features (MVP)
+- Admin authentication and account settings
+- Training event management
+- Participant import via CSV
+- Email workflows for verification and password reset
+- Public-facing pages and verification-related flows
 
-1. **Admin Authentication** — Secure login for DICT staff
-2. **Training Event Management** — CRUD interface for events
-3. **CSV Bulk Upload** — Parse and link participant data to events
-4. **PDF Certificate Generation** — Map participant data to official DICT template
-5. **QR Code Embedding** — Unique UUID per participant, stamped onto PDF
-6. **Email Queue** — Automated background dispatch of certificates to participants
-7. **Public Verification Portal** — Landing page to scan/validate QR codes against the database
+## Tech Stack
 
----
+- Backend: Laravel 12, PHP 8.2+
+- Frontend: Livewire 4, Blade, Tailwind, Vite
+- Database: MySQL 8+
+- Testing: Pest + PHPUnit
 
-## Technology Stack
+## Required Apps For Collaborators
 
-| Layer | Technology |
-|---|---|
-| Backend | PHP 8.x + Laravel |
-| Frontend | HTML5, CSS3, Bootstrap 5 |
-| Database | MySQL / MariaDB (via Laragon) |
-| PDF Generation | dompdf / laravel-snappy |
-| QR Code | Simple QrCode |
+Install these on your machine before setup:
 
----
+1. Git
+2. Docker Desktop (recommended workflow)
+3. VS Code
 
-## Target Users
+Optional (only if not using Docker for local runtime):
 
-- **DICT Admin** — Uploads participant data, manages events, triggers generation
-- **Participants** — Receive certificates via email
-- **Third-Party Verifiers** — Scan QR codes on the public portal to verify authenticity
+1. PHP 8.2+
+2. Composer 2.8+
+3. Node.js 22+
+4. MySQL 8+
 
----
+## Quick Start (Recommended: Docker)
 
-## System Workflow
+This repository includes a Docker environment so all collaborators use aligned versions:
 
-```
-Admin uploads CSV
-    → Parse & validate data
-    → Generate UUID per participant
-    → Generate QR Code
-    → Map data to certificate template
-    → Generate PDF
-    → Store record in DB
-    → Queue email job
-    → Send certificate to participant
+- PHP `8.2` (`php:8.2-cli-bookworm`)
+- MySQL `8.4` (`mysql:8.4`)
+- Composer `2.8` (`composer:2.8`)
+- Node `22` (`node:22-alpine`)
 
-Third-Party Verifier scans QR Code
-    → Redirect to public verification portal
-    → Validate UUID against DB
-    → Display verification result
+### 1. Clone and enter project
+
+```bash
+git clone https://github.com/CodinghamPalace/e-certify.git
+cd e-certify
 ```
 
----
+### 2. Start core containers
 
-## Implementation Timeline (8 Weeks)
+```bash
+docker compose up -d --build mysql app
+```
 
-| Week | Phase | Key Tasks |
-|---|---|---|
-| 1 | Planning & Setup | Requirements, DB schema, Laravel init, local env |
-| 2 | Auth & Event Module | Admin login, Training Event CRUD |
-| 3 | Data Ingestion | CSV upload, parsing, link to events |
-| 4 | PDF Generation | PDF library integration, template mapping |
-| 5 | QR Integration | UUID generation, QR stamping on PDFs |
-| 6 | Email Automation | SMTP config, Laravel Jobs/Queues |
-| 7 | Verification Portal | Public QR scan page, DB validation logic |
-| 8 | Testing & Turnover | UAT with DICT staff, bug fixes, UI polish, handover |
+### 3. Install backend dependencies
 
----
+```bash
+docker compose run --rm composer install
+```
 
-## Required Assets (Request from DICT Office)
+### 4. Configure environment
 
-- [ ] High-resolution DICT logo (transparent PNG)
-- [ ] Bagong Pilipinas logo (transparent PNG)
-- [ ] Relevant program logos (transparent PNG)
-- [ ] Digital e-signatures of approving authorities (transparent PNG)
-- [ ] Standard blank certificate background template
-- [ ] Access to staging environment (by Week 7)
+```bash
+cp .env.example .env
+```
 
----
+If `.env.example` is missing, create `.env` and set at least:
 
-## Scope & Limitations
+```env
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
 
-**In Scope:**
-- Admin authentication
-- Bulk CSV participant upload
-- PDF generation with QR code
-- Automated email dispatch
-- Public QR verification portal
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=e_certify
+DB_USERNAME=e_certify_user
+DB_PASSWORD=secret
+```
 
-**Out of Scope (MVP):**
-- Online event registration
-- Multiple certificate layout formats
-- Analytics, facial recognition, or attendance tracking
+### 5. Generate app key and migrate
+
+```bash
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+```
+
+### 6. Run application server
+
+```bash
+docker compose exec app php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Open `http://localhost:8000`.
+
+### 7. Run Vite dev server (optional)
+
+```bash
+docker compose up node
+```
+
+Open `http://localhost:5173`.
+
+## Local Setup Without Docker (Optional)
+
+Use this only if your machine already has PHP, Composer, Node, and MySQL installed.
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+php artisan serve
+```
+
+## Team Workflow
+
+### Branching
+
+1. Pull latest `main`
+2. Create a feature branch (`feat/...`, `fix/...`, `chore/...`)
+3. Open a PR when ready
+
+### Before pushing
+
+```bash
+php artisan test --compact
+```
+
+If frontend files changed:
+
+```bash
+npm run build
+```
+
+## Laravel Cloud Deployment Notes
+
+### Initial deploy checklist
+
+1. Ensure app root is repository root
+2. Set required environment variables in Laravel Cloud
+3. Run migrations in deployment/commands panel
+
+### Mail setup checklist
+
+Set these in Laravel Cloud custom environment variables:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-username
+MAIL_PASSWORD=your-smtp-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@yourdomain.com
+MAIL_FROM_NAME="e-certify"
+```
+
+Then run:
+
+```bash
+php artisan optimize:clear
+php artisan config:clear
+```
+
+## Useful Commands
+
+```bash
+# Stop all containers
+docker compose down
+
+# Stop and remove DB volume
+docker compose down -v
+
+# Run tests
+docker compose exec app php artisan test
+
+# Update composer dependencies
+docker compose run --rm composer update
+
+# Clear Laravel caches
+php artisan optimize:clear
+```
+
+## Troubleshooting
+
+### Vite manifest missing (`public/build/manifest.json`)
+
+```bash
+npm install
+npm run build
+```
+
+### Port 8000 already in use
+
+Stop old processes and restart `php artisan serve`.
+
+### Mail not sending in Cloud
+
+1. Verify Cloud env variables are not placeholders
+2. Clear config cache in Cloud
+3. Check Cloud logs for SMTP authentication errors
+
+## License
+
+This project is open-sourced software licensed under the MIT license.
