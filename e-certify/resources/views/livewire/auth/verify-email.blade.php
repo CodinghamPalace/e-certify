@@ -43,7 +43,7 @@
                 </flux:button>
                 <flux:button
                     type="submit"
-                    variant="secondary"
+                    variant="outline"
                     class="w-full"
                     :disabled="$throttled || $maxedOut"
                 >
