@@ -1,0 +1,1 @@
+<flux:button type="submit" variant="secondary" class="w-full" disabled="BLAZE_PLACEHOLDER_GABNXGCULOX3EJPU"><x-slot name="slot">BLAZE_PLACEHOLDER_YKSWNOVE4OJT6BL0</x-slot></flux:button>
