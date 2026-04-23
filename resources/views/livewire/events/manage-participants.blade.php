@@ -10,10 +10,18 @@
             <h5 class="mb-0 fw-bold" style="color:#1e293b;">Participants: {{ $event->title }}</h5>
             <p class="text-muted mb-0" style="font-size:.82rem;">Manage participants and bulk upload via CSV.</p>
         </div>
-        <button wire:click="openUploadModal" type="button" class="btn btn-sm btn-primary d-flex align-items-center justify-content-center gap-2"
-            style="background:var(--dict-blue);border-color:var(--dict-blue);border-radius:8px;font-size:.82rem; min-height: 38px;">
-            <i class="bi bi-upload"></i> Bulk Upload CSV
-        </button>
+        <div class="d-flex gap-2">
+            @if($pendingCount > 0)
+                <button wire:click="confirmBulkSend" type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center gap-2"
+                    style="border-radius:8px;font-size:.82rem; min-height: 38px;">
+                    <i class="bi bi-envelope-paper"></i> Send All Pending ({{ $pendingCount }})
+                </button>
+            @endif
+            <button wire:click="openUploadModal" type="button" class="btn btn-sm btn-primary d-flex align-items-center justify-content-center gap-2"
+                style="background:var(--dict-blue);border-color:var(--dict-blue);border-radius:8px;font-size:.82rem; min-height: 38px;">
+                <i class="bi bi-upload"></i> Bulk Upload CSV
+            </button>
+        </div>
     </div>
 
     @if (session()->has('message'))
@@ -31,6 +39,10 @@
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
                 <input wire:model.live="search" type="text" class="form-control bg-light border-start-0" placeholder="Search participants...">
             </div>
+            <div wire:loading wire:target="sendBulk, sendSingle" class="text-primary small">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                Processing queue...
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -41,7 +53,7 @@
                         <th>Email</th>
                         <th class="d-none d-md-table-cell">UUID / Certificate ID</th>
                         <th>Status</th>
-                        <th style="width:80px;">Actions</th>
+                        <th style="width:120px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +80,12 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-1">
+                                    @if($participant->status === 'generated')
+                                        <button wire:click="confirmSingleSend({{ $participant->id }})" type="button" class="btn btn-sm btn-outline-success py-0 px-2"
+                                            style="font-size:.72rem;border-radius:6px;" title="Send Certificate Email">
+                                            <i class="bi bi-envelope"></i>
+                                        </button>
+                                    @endif
                                     <button wire:click="edit({{ $participant->id }})" type="button" class="btn btn-sm btn-outline-primary py-0 px-2"
                                         style="font-size:.72rem;border-radius:6px;" title="Edit Participant">
                                         <i class="bi bi-pencil-square"></i>
@@ -99,6 +117,59 @@
             </div>
         @endif
     </div>
+
+    <!-- Bulk Send Confirmation Modal -->
+    @if($showBulkSendModal)
+    <div class="modal fade show" id="bulkSendModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: var(--dict-blue-dk);">
+                    <h6 class="modal-title fw-semibold">
+                        <i class="bi bi-envelope-paper me-2"></i>Bulk Send Certificates
+                    </h6>
+                    <button wire:click="closeModals" type="button" class="btn-close btn-close-white" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" style="font-size:.88rem;">
+                    <div class="text-center mb-3">
+                        <i class="bi bi-send-check-fill" style="font-size: 2.5rem; color: var(--dict-blue);"></i>
+                    </div>
+                    <p class="mb-0">Are you sure you want to queue <strong>{{ $pendingCount }}</strong> certificates for background delivery to participants?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button wire:click="closeModals" type="button" class="btn btn-sm btn-secondary px-3" style="border-radius: 7px;">Cancel</button>
+                    <button wire:click="sendBulk" type="button" class="btn btn-sm btn-primary px-4" style="background: var(--dict-blue); border-color: var(--dict-blue); border-radius: 7px;">
+                        Yes, Queue All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Single Send Confirmation Modal -->
+    @if($showSingleSendModal)
+    <div class="modal fade show" id="singleSendModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: var(--dict-blue-dk);">
+                    <h6 class="modal-title fw-semibold">
+                        <i class="bi bi-envelope me-2"></i>Send Certificate
+                    </h6>
+                    <button wire:click="closeModals" type="button" class="btn-close btn-close-white" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" style="font-size:.88rem;">
+                    <p class="mb-0">Are you sure you want to send the certificate email to this participant now?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button wire:click="closeModals" type="button" class="btn btn-sm btn-secondary px-3" style="border-radius: 7px;">Cancel</button>
+                    <button wire:click="sendSingle" type="button" class="btn btn-sm btn-primary px-4" style="background: var(--dict-blue); border-color: var(--dict-blue); border-radius: 7px;">
+                        Send Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Edit Participant Modal -->
     @if($showEditModal)

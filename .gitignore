@@ -1,23 +1,43 @@
-/.phpunit.cache
+# --- Laravel Core ---
 /node_modules
+/vendor
+/.phpunit.cache
+.phpunit.result.cache
+.phpactor.json
+
+# --- Storage & Framework (THE FIX) ---
+/storage/*.key
+/storage/app/public/*
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*.php
+/storage/logs/*.log
+/storage/pail
+
+# --- Public Assets ---
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
+
+# --- Environment & Credentials ---
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
 /auth.json
+
+# --- Local Configs & IDEs ---
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+Homestead.json
+Homestead.yaml
+
+# --- Logs ---
+npm-debug.log
+yarn-error.log
+
+# --- Local Project Brain ---
+GEMINI.md
